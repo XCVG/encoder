@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace encoder
@@ -12,10 +13,20 @@ namespace encoder
     {
 
         private static string CurrentDirectory => Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-        private const string DefaultCommandLine = "-c:v h264_cuvid -i \"{0}\" -c:v hevc_nvenc -profile:v main -pixel_format yuv420p -preset medium -rc:v vbr_hq -cq:v 19 -b:v 10000k -maxrate:v 16000k -c:a copy -map 0 \"{1}\"";
+        private const string DefaultCommandLine = "-i \"{0}\" -c:v hevc_nvenc -preset medium -rc:v vbr_hq -cq:v 23 -b:v 0 -c:a copy -map 0 \"{1}\"";
 
         static void Main(string[] args)
         {
+            //default working directory
+            string workingDirectory = CurrentDirectory;
+
+            //use -i if available
+            if(args.Contains("-i"))
+            {
+                var idx = Array.IndexOf(args, "-i") + 1;
+                workingDirectory = args[idx].Trim('\'', '"');
+            }
+
             //setup ffmpeg command line
             string commandLine = DefaultCommandLine;
             var customPath = Path.Combine(CurrentDirectory, "custom.txt");
@@ -25,12 +36,25 @@ namespace encoder
             }
 
             //create recoded folder if it does not exist
-            var targetPath = Path.Combine(CurrentDirectory, "recoded");
+            var targetPath = Path.Combine(workingDirectory, "recoded");
+
+            //use -o if available
+            if (args.Contains("-o"))
+            {
+                var idx = Array.IndexOf(args, "-o") + 1;
+                targetPath = args[idx].Trim('\'', '"');
+            }
+
             if (!Directory.Exists(targetPath))
                 Directory.CreateDirectory(targetPath);
 
+            Console.WriteLine("Working directory: " + workingDirectory);
+            Console.WriteLine("Target directory: " + targetPath);
+
+            Thread.Sleep(5000);
+
             //transcode all the things
-            foreach(var file in Directory.EnumerateFiles(CurrentDirectory))
+            foreach(var file in Directory.EnumerateFiles(workingDirectory))
             {
                 string extension = Path.GetExtension(file);
                 if (!(string.Equals(extension, ".mp4", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".mov", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".mkv", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".wmv", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".mpg", StringComparison.OrdinalIgnoreCase)))
