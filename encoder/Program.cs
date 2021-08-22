@@ -13,7 +13,7 @@ namespace encoder
     {
 
         private static string CurrentDirectory => Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-        private const string DefaultCommandLine = "-i \"{0}\" -c:v hevc_nvenc -preset medium -rc:v vbr_hq -cq:v 23 -b:v 0 -c:a copy -map 0 \"{1}\"";
+        private const string DefaultCommandLine = "-i \"{0}\" -c:v hevc_nvenc -preset medium -rc:v vbr -cq:v 23 -b:v 0 -c:a copy -report -map 0 \"{1}\"";
 
         static void Main(string[] args)
         {
@@ -69,7 +69,7 @@ namespace encoder
                 Console.WriteLine("Transcoding " + file);
 
                 Process p = new Process();
-                p.StartInfo.Arguments = string.Format(commandLine, Path.GetFileName(file), Path.Combine(targetPath, targetFileName));
+                p.StartInfo.Arguments = string.Format(commandLine, Path.GetFullPath(file), Path.Combine(targetPath, targetFileName));
                 p.StartInfo.WorkingDirectory = CurrentDirectory;
                 p.StartInfo.FileName = "ffmpeg.exe";
                 p.StartInfo.CreateNoWindow = false;
