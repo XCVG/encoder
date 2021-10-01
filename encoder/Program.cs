@@ -57,11 +57,11 @@ namespace encoder
             foreach(var file in Directory.EnumerateFiles(workingDirectory))
             {
                 string extension = Path.GetExtension(file);
-                if (!(string.Equals(extension, ".mp4", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".mov", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".mkv", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".wmv", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".mpg", StringComparison.OrdinalIgnoreCase)))
+                if (!(string.Equals(extension, ".mp4", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".mov", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".mkv", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".wmv", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".avi", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".mpg", StringComparison.OrdinalIgnoreCase)))
                     continue;
 
                 string fileName = Path.GetFileNameWithoutExtension(file);
-                string targetFileName = fileName + ".mp4";
+                string targetFileName = fileName + (commandLine.Contains("{1}.") ? "" : ".mp4");
 
                 if (File.Exists(Path.Combine(targetPath, targetFileName)))
                     continue;
